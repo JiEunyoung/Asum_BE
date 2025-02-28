@@ -5,9 +5,17 @@ spring:
     url: jdbc:mysql://localhost:3306/asum_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: asum
     password: 1234
+  servlet:
+    multipart:
+      enabled: true         # multipart 업로드 활성화
+      max-file-size: 10MB   # 업로드 가능한 최대 파일 크기
+      max-request-size: 10MB # 전체 요청 크기 제한
 
 # mybatis 설정
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath:/mapper/*.xml
   config-location: classpath:mybatis-config.xml
   type-aliases-package: com.example.Asum_BE
+
+file:
+  dir: C:\\Users\\USER\\Desktop\\imgFile\\
