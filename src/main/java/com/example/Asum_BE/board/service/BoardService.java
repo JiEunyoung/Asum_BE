@@ -69,7 +69,7 @@ public class BoardService {
     public BoardResponseDto savePost(BoardRequestDto boardRequestDto, List<MultipartFile> multipartFiles) throws IOException {
 
         if(boardRequestDto.getTitle() == null || boardRequestDto.getTitle().trim().isEmpty()) {
-            throw new InvalidPostException("제목을 필수 입력 항목입니다.");
+            throw new InvalidPostException("제목은 필수 입력 항목입니다.");
         }
         if(boardRequestDto.getContent() == null || boardRequestDto.getContent().trim().isEmpty()){
             throw new InvalidPostException("내용은 필수 입력 항목입니다.");
