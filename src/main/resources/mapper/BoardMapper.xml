@@ -18,7 +18,8 @@
         b.title,
         b.content,
         b.created_at AS createdAt,
-        b.is_deleted AS isDeleted
+        b.is_deleted AS isDeleted,
+        b.view_count AS viewCount
         FROM
         board b
         WHERE b.board_id = #{boardId}
@@ -90,6 +91,13 @@
         SET is_deleted = TRUE
         WHERE board_id = #{boardId}
         AND upload_file_name = #{deleteImage}
+    </update>
+
+    <!-- 게시물 조회수 증가 -->
+    <update id="increaseViewCount" parameterType="java.lang.Long">
+        UPDATE board
+        SET view_count = view_count + 1
+        WHERE board_id = #{board_id}
     </update>
 
 </mapper>

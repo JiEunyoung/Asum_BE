@@ -42,7 +42,8 @@ public class BoardService {
                             postEntity.getContent(),
                             thumbnailList,
                             postEntity.getCreatedAt(),
-                            postEntity.getIsDeleted()
+                            postEntity.getIsDeleted(),
+                            postEntity.getViewCount()
                     );
                 })
                 .collect(Collectors.toList());
@@ -60,7 +61,8 @@ public class BoardService {
                 postByIdEntity.getContent(),
                 imagesByIdEntity.stream().map(BoardImageEntity::getStoreFileName).collect(Collectors.toList()),
                 postByIdEntity.getCreatedAt(),
-                postByIdEntity.getIsDeleted()
+                postByIdEntity.getIsDeleted(),
+                postByIdEntity.getViewCount()
         );
     }
 
@@ -98,7 +100,8 @@ public class BoardService {
                         .map(entity -> entity.getStoreFileName())
                         .collect(Collectors.toList()),
                 postByIdEntity.getCreatedAt(),
-                postByIdEntity.getIsDeleted()
+                postByIdEntity.getIsDeleted(),
+                postByIdEntity.getViewCount()
         );
     }
 
@@ -138,7 +141,8 @@ public class BoardService {
                         .map(entity -> entity.getStoreFileName())
                         .collect(Collectors.toList()),
                 existedPostEntity.getCreatedAt(),
-                existedPostEntity.getIsDeleted()
+                existedPostEntity.getIsDeleted(),
+                existedPostEntity.getViewCount()
         );
     }
 
@@ -152,5 +156,11 @@ public class BoardService {
 
         boardMapper.deletePost(boardId);
         boardMapper.deletePostToImage(boardId);
+    }
+
+    // 게시글 조회수 증가
+    @Transactional
+    public void increaseViewCount(Long boardId) {
+        boardMapper.increaseViewCount(boardId);
     }
 }

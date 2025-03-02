@@ -28,6 +28,8 @@ public class BoardController {
     // 게시글 조회
     @GetMapping("/api/community/post/{boardId}")
     public ResponseEntity<BoardResponseDto> findPostById(@PathVariable Long boardId){
+        boardService.increaseViewCount(boardId);
+
         return ResponseEntity.ok(boardService.findPostById(boardId));
     }
 

@@ -38,4 +38,7 @@ public interface BoardMapper {
 
     // 게시글 수정에서의 이미지 삭제
     void deleteImage(Long boardId, String deleteImage);
+
+    // 게시글 조회수 증가
+    void increaseViewCount(Long boardId);
 }

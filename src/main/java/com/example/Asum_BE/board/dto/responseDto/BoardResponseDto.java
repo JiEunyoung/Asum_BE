@@ -18,4 +18,5 @@ public class BoardResponseDto {
     public List<String> storeFilePath;
     public Date createdAt;
     public Boolean isDeleted;
+    public Long viewCount;
 }
