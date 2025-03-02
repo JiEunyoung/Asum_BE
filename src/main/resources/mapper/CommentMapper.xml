@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.Asum_BE.comment.mapper.CommentMapper">
+
+    <!-- 게시글에 해당하는 댓글 조회 -->
+    <select id="findCommentsById" parameterType="java.lang.Long" resultType = "com.example.Asum_BE.comment.entity.CommentEntity">
+        SELECT * FROM comment
+        WHERE board_id = #{boardId}
+        AND parent_id IS NULL
+        AND is_deleted = FALSE
+    </select>
+
+    <!-- 게시글에 해당하는 대댓글 조회 -->
+    <select id="findReplyCommentsById" parameterType="java.lang.Long" resultType = "com.example.Asum_BE.comment.entity.CommentEntity">
+        SELECT * FROM comment
+        WHERE board_id = #{boardId}
+        AND parent_id IS NOT NULL
+        AND is_deleted = FALSE
+    </select>
+
+    <!-- 댓글 조회 -->
+    <select id="findCommentById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.comment.entity.CommentEntity">
+        SELECT * FROM comment
+        WHERE comment_id = #{commentId}
+        AND is_deleted = FALSE
+    </select>
+
+    <!-- 댓글 저장 -->
+    <insert id="saveComment" parameterType="com.example.Asum_BE.comment.entity.CommentEntity" useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO comment(board_id, user_id, parent_id, content, created_at)
+        VALUES (#{boardId}, #{userId}, #{parentId}, #{content}, NOW())
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="updateComment" parameterType="com.example.Asum_BE.comment.entity.CommentEntity">
+        UPDATE comment
+        SET content = #{content}
+        WHERE comment_id = #{commentId}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <update id="deleteComment" parameterType="java.lang.Long">
+        UPDATE comment
+        SET is_deleted = TRUE
+        WHERE comment_id = #{commentId}
+    </update>
+
+</mapper>

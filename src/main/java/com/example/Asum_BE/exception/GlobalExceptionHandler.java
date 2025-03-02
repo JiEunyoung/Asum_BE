@@ -13,4 +13,11 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidCommentException.class)
+    public ResponseEntity<String> handleInvalidCommentException(InvalidCommentException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
 }
