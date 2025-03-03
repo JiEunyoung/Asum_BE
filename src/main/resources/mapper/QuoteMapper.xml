@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.Asum_BE.quote.mapper.QuoteMapper">
+
+    <!-- 카테고리의 질문 조회 -->
+    <select id="findQuestionsById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.quote.entity.QuestionEntity">
+        SELECT
+        q.question_id AS questionId,
+        q.question,
+        q.category_id AS categoryId,
+        c.category_name AS categoryName
+        FROM
+        question q
+        JOIN category c
+        ON c.category_id = q.category_id
+        OR q.category_id IS NULL
+        WHERE c.category_id = #{categoryId}
+        AND (c.include_common = TRUE OR q.category_id IS NOT NULL)
+    </select>
+
+    <!-- 카테고리의 답변 조회 -->
+    <select id="findAnswerOptionById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.quote.entity.AnswerEntity">
+        SELECT
+        q.question_id AS questionId,
+        q.category_id AS categoryId,
+        a.answer_option AS answerOption
+        FROM
+        question q
+        JOIN category c
+        ON c.category_id = q.category_id
+        OR q.category_id IS NULL
+        JOIN answer a
+        ON q.question_id = a.question_id
+        WHERE c.category_id = #{categoryId}
+        AND (c.include_common = TRUE OR q.category_id IS NOT NULL)
+    </select>
+
+    <!-- 카테고리 이름 조회 -->
+    <select id="findCategoryNameById" parameterType="java.lang.Long">
+        SELECT
+        category_name
+        FROM
+        category
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <!-- 견적서(선택한 답변) 저장 -->
+    <insert id="saveQuote" parameterType="java.util.List">
+        <selectKey resultType="long" keyProperty="quoteId" order="BEFORE">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO quote (user_id, category_id, question_id, answer_id, other_answer, created_at)
+        VALUES
+        <foreach collection="quoteEntities" item="quote" separator=",">
+            (#{quote.userId}, #{quote.categoryId}, #{quote.questionId}, #{quote.answerId}, #{quote.otherAnswer}, NOW())
+        </foreach>
+    </insert>
+
+    <!-- 견적서(선택한 답변) 조회 -->
+    <select id="findQuoteById" resultMap="quoteResultMap">
+        SELECT
+        c.category_name,
+        q.question, a.answer_option,
+        quote.other_answer
+        FROM
+        quote
+        JOIN category c
+        ON c.category_id = quote.category_id
+        JOIN question q
+        ON q.question_id = quote.question_id
+        JOIN answer a
+        ON a.answer_id = quote.answer_id
+        WHERE quote.user_id = #{userId}
+        and quote.category_id = #{categoryId}
+    </select>
+
+    <resultMap id="quoteResultMap" type="com.example.Asum_BE.quote.dto.responseDto.QuoteResponseDto">
+        <result property="categoryName" column="category_name"/>
+        <collection property="userAnswerResponseDtos" ofType="com.example.Asum_BE.quote.dto.responseDto.UserAnswerResponseDto">
+            <result property="question" column="question"/>
+            <result property="answerOption" column="answer_option"/>
+            <result property="otherAnswer" column="other_answer"/>
+        </collection>
+    </resultMap>
+</mapper>
