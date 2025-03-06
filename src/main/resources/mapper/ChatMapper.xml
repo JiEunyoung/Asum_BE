@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.Asum_BE.chat.mapper.ChatMapper">
+
+    <!-- 채팅방 생성 -->
+    <insert id="createChatRoom" parameterType="com.example.Asum_BE.chat.entity.ChatRoomEntity" useGeneratedKeys="true" keyProperty="roomId">
+        INSERT INTO chat_room (user_id, expert_id, created_at)
+        VALUES (#{userId}, #{expertId}, NOW())
+    </insert>
+
+    <!-- 생성된 채팅방 조회 -->
+    <select id="findChatRoomById" resultType="com.example.Asum_BE.chat.entity.ChatRoomEntity">
+        SELECT * FROM chat_room
+        WHERE user_id = #{userId}
+        AND expert_id = #{expertId}
+    </select>
+
+    <!-- 채팅 메시지 저장 -->
+    <insert id="sendMessage" parameterType="com.example.Asum_BE.chat.entity.ChatEntity" useGeneratedKeys="true" keyProperty="chatId">
+        INSERT INTO chat (room_id, sender_id, message, created_at)
+        VALUES (#{roomId}, #{senderId}, #{message}, NOW())
+    </insert>
+
+    <!-- 보낸 메시지 조회 -->
+    <select id="findMessageById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.chat.entity.ChatEntity">
+        SELECT * FROM chat
+        WHERE chat_id = #{chatId}
+    </select>
+
+    <!-- 모든 채팅 메시지 조회 -->
+    <select id="findMessagesById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.chat.entity.ChatEntity">
+        SELECT * FROM chat
+        WHERE room_id = #{roomId}
+    </select>
+</mapper>

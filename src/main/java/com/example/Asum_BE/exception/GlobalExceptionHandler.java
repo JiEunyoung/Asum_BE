@@ -20,4 +20,11 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidChatException.class)
+    public ResponseEntity<String> handleInvalidChatException(InvalidChatException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
 }
