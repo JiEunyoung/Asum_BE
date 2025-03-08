@@ -6,6 +6,7 @@ import com.example.Asum_BE.comment.dto.responseDto.CommentsResponseDto;
 import com.example.Asum_BE.comment.entity.CommentEntity;
 import com.example.Asum_BE.comment.mapper.CommentMapper;
 import com.example.Asum_BE.exception.InvalidCommentException;
+import com.example.Asum_BE.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final NotificationService notificationService;
 
     // 게시글에 해당하는 댓글 조회
     public List<CommentsResponseDto> findCommentsById(Long boardId) {
@@ -85,6 +87,8 @@ public class CommentService {
         commentMapper.saveComment(commentEntity);
 
         CommentEntity commentByIdEntity = commentMapper.findCommentById(commentEntity.getCommentId());
+
+        notificationService.sendCommentNotification(commentEntity, "게시글에 새로운 댓글이 달렸습니다.");
 
         return new CommentResponseDto(
                 commentByIdEntity.getCommentId(),

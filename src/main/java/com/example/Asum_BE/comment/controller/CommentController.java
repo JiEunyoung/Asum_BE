@@ -24,7 +24,7 @@ public class CommentController {
     }
 
     // 댓글 저장
-    @PostMapping(value = "/api/community/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/api/community/comment")
     public ResponseEntity<CommentRequestDto> saveComment(@RequestBody CommentRequestDto commentRequestDto) {
         // JWT 사용 예정
         Long author_id = 1L;
@@ -36,7 +36,7 @@ public class CommentController {
     }
 
     // 댓글 수정
-    @PutMapping(value = "/api/community/comment/{commentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/api/community/comment/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDto commentRequestDto) {
         CommentResponseDto commentResponseDto = commentService.updateComment(commentId, commentRequestDto);
         return ResponseEntity.ok(commentResponseDto);
