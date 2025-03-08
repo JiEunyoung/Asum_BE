@@ -8,6 +8,7 @@
     <select id="findAllPosts" resultType="com.example.Asum_BE.board.entity.BoardEntity">
         SELECT * FROM board
         WHERE is_deleted = FALSE
+        ORDER BY created_at DESC
     </select>
 
     <!-- 게시글 조회 -->
@@ -55,6 +56,7 @@
         FROM board_image
         WHERE board_id = #{boardId}
         AND is_deleted = FALSE
+        ORDER BY image_id ASC
     </select>
 
     <!-- 게시글 썸네일 이미지 조회 -->

@@ -33,5 +33,6 @@
     <select id="findMessagesById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.chat.entity.ChatEntity">
         SELECT * FROM chat
         WHERE room_id = #{roomId}
+        ORDER BY created_at DESC
     </select>
 </mapper>
