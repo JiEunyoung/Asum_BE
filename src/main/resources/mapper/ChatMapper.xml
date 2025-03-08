@@ -19,8 +19,8 @@
 
     <!-- 채팅 메시지 저장 -->
     <insert id="sendMessage" parameterType="com.example.Asum_BE.chat.entity.ChatEntity" useGeneratedKeys="true" keyProperty="chatId">
-        INSERT INTO chat (room_id, sender_id, message, created_at)
-        VALUES (#{roomId}, #{senderId}, #{message}, NOW())
+        INSERT INTO chat (room_id, sender_id, message, created_at, role)
+        VALUES (#{roomId}, #{senderId}, #{message}, NOW(), #{role})
     </insert>
 
     <!-- 보낸 메시지 조회 -->

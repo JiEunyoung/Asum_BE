@@ -29,8 +29,8 @@
 
     <!-- 댓글 저장 -->
     <insert id="saveComment" parameterType="com.example.Asum_BE.comment.entity.CommentEntity" useGeneratedKeys="true" keyProperty="commentId">
-        INSERT INTO comment(board_id, user_id, parent_id, content, created_at)
-        VALUES (#{boardId}, #{userId}, #{parentId}, #{content}, NOW())
+        INSERT INTO comment(board_id, author_id, parent_id, content, created_at, role)
+        VALUES (#{boardId}, #{authorId}, #{parentId}, #{content}, NOW(), #{role})
     </insert>
 
     <!-- 댓글 수정 -->

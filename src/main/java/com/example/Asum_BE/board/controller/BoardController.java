@@ -37,7 +37,11 @@ public class BoardController {
     @PostMapping(value = "/api/community/post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BoardResponseDto> savePost(@RequestPart BoardRequestDto boardRequestDto,
                                                      @RequestPart(value = "multipartFiles", required = false) List<MultipartFile> multipartFiles) throws IOException {
-        BoardResponseDto boardResponseDto = boardService.savePost(boardRequestDto, multipartFiles);
+        //JWT 사용 예정
+        Long author_id = 1L;
+        String role = "USER";
+
+        BoardResponseDto boardResponseDto = boardService.savePost(boardRequestDto, multipartFiles, author_id, role);
 
         return ResponseEntity.ok(boardResponseDto);
     }

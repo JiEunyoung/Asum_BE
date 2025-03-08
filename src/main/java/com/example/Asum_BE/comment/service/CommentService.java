@@ -44,18 +44,19 @@ public class CommentService {
                             .map(reply -> {
                                 return new CommentResponseDto(
                                         reply.getCommentId(),
-                                        reply.getUserId(),
+                                        reply.getAuthorId(),
                                         reply.getParentId(),
                                         reply.getContent(),
                                         reply.getCreatedAt(),
-                                        reply.getIsDeleted()
+                                        reply.getIsDeleted(),
+                                        reply.getRole()
                                 );
                             })
                             .collect(Collectors.toList());
 
                     return new CommentsResponseDto(
                             commentEntity.getCommentId(),
-                            commentEntity.getUserId(),
+                            commentEntity.getAuthorId(),
                             commentEntity.getParentId(),
                             commentEntity.getContent(),
                             commentEntity.getCreatedAt(),
@@ -68,7 +69,7 @@ public class CommentService {
 
     // 댓글 저장
     @Transactional
-    public CommentResponseDto saveComment(CommentRequestDto commentRequestDto) {
+    public CommentResponseDto saveComment(CommentRequestDto commentRequestDto, Long authorId, String role) {
 
         if(commentRequestDto.getContent() == null || commentRequestDto.getContent().trim().isEmpty()) {
             throw new InvalidCommentException("댓글은 필수 입력 항목입니다.");
@@ -76,9 +77,10 @@ public class CommentService {
 
         CommentEntity commentEntity = CommentEntity.builder()
                 .boardId(commentRequestDto.getBoardId())
-                .userId(1L)
+                .authorId(authorId)
                 .parentId(commentRequestDto.getParentId())
                 .content(commentRequestDto.getContent())
+                .role(role)
                 .build();
         commentMapper.saveComment(commentEntity);
 
@@ -86,11 +88,12 @@ public class CommentService {
 
         return new CommentResponseDto(
                 commentByIdEntity.getCommentId(),
-                commentByIdEntity.getUserId(),
+                commentByIdEntity.getAuthorId(),
                 commentByIdEntity.getParentId(),
                 commentByIdEntity.getContent(),
                 commentByIdEntity.getCreatedAt(),
-                commentByIdEntity.getIsDeleted()
+                commentByIdEntity.getIsDeleted(),
+                commentByIdEntity.getRole()
         );
     }
 
@@ -107,11 +110,12 @@ public class CommentService {
 
         return new CommentResponseDto(
                 commentByIdEntity.getCommentId(),
-                commentByIdEntity.getUserId(),
+                commentByIdEntity.getAuthorId(),
                 commentByIdEntity.getParentId(),
                 updateEntity.getContent(),
                 commentByIdEntity.getCreatedAt(),
-                commentByIdEntity.getIsDeleted()
+                commentByIdEntity.getIsDeleted(),
+                commentByIdEntity.getRole()
         );
     }
 

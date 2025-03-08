@@ -14,24 +14,26 @@ import java.util.stream.Collectors;
 public class BoardEntity {
 
     private Long boardId;
-    private Long userId;
+    private Long authorId;
     private String title;
     private String content;
     private List<BoardImageEntity> boardImageEntities;
     private Date createdAt;
     private Boolean isDeleted;
     private Long viewCount;
+    private String role;
 
     @Builder
-    BoardEntity(Long boardId, Long userId, String title, String content, List<BoardImageEntity> boardImageEntities, Date createdAt, Boolean isDeleted, Long viewCount) {
+    BoardEntity(Long boardId, Long authorId, String title, String content, List<BoardImageEntity> boardImageEntities, Date createdAt, Boolean isDeleted, Long viewCount, String role) {
         this.boardId = boardId;
-        this.userId = userId;
+        this.authorId = authorId;
         this.title = title;
         this.content = content;
         this.boardImageEntities = boardImageEntities;
         this.createdAt = createdAt;
         this.isDeleted = isDeleted;
         this.viewCount = viewCount;
+        this.role = role;
     }
 
     public BoardEntity update(String title, String content){

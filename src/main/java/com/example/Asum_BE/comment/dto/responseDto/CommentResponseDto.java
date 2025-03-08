@@ -14,9 +14,10 @@ import java.util.Date;
 public class CommentResponseDto {
 
     private Long commentId;
-    private Long userId;
+    private Long authorId;
     private Long parentId;
     private String content;
     private Date createdAt;
     private Boolean isDeleted;
+    private String role;
 }

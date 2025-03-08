@@ -11,12 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 public class BoardResponseDto {
 
-    public Long boardId;
-    public Long userId;
-    public String title;
-    public String content;
-    public List<String> storeFilePath;
-    public Date createdAt;
-    public Boolean isDeleted;
-    public Long viewCount;
+    private Long boardId;
+    private Long authorId;
+    private String title;
+    private String content;
+    private List<String> storeFilePath;
+    private Date createdAt;
+    private Boolean isDeleted;
+    private Long viewCount;
+    private String role;
 }

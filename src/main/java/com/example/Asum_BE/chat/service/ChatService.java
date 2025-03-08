@@ -58,6 +58,7 @@ public class ChatService {
                 .roomId(chatMessageRequestDto.getRoomId())
                 .senderId(chatMessageRequestDto.getSenderId())
                 .message(chatMessageRequestDto.getMessage())
+                .role(chatMessageRequestDto.getRole())
                 .build();
 
         chatMapper.sendMessage(chatEntity);
@@ -67,7 +68,8 @@ public class ChatService {
                 sendChatEntity.getRoomId(),
                 sendChatEntity.getSenderId(),
                 sendChatEntity.getMessage(),
-                sendChatEntity.getCreatedAt()
+                sendChatEntity.getCreatedAt(),
+                sendChatEntity.getRole()
         );
     }
 
@@ -81,7 +83,8 @@ public class ChatService {
                             entity.getRoomId(),
                             entity.getSenderId(),
                             entity.getMessage(),
-                            entity.getCreatedAt()
+                            entity.getCreatedAt(),
+                            entity.getRole()
                     );
                 })
                 .collect(Collectors.toList());

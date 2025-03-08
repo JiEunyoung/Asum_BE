@@ -15,7 +15,7 @@ import java.util.List;
 public class CommentsResponseDto {
 
     private Long commentId;
-    private Long userId;
+    private Long authorId;
     private Long parentId;
     private String content;
     private Date createdAt;

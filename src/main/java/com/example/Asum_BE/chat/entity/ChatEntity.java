@@ -18,4 +18,5 @@ public class ChatEntity {
     private Long senderId;
     private String message;
     private Date createdAt;
+    private String role;
 }

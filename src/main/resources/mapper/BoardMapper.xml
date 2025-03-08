@@ -14,12 +14,13 @@
     <select id="findPostById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.board.entity.BoardEntity">
         SELECT
         b.board_id AS boardId,
-        b.user_id AS userId,
+        b.author_id AS authorId,
         b.title,
         b.content,
         b.created_at AS createdAt,
         b.is_deleted AS isDeleted,
-        b.view_count AS viewCount
+        b.view_count AS viewCount,
+        b.role
         FROM
         board b
         WHERE b.board_id = #{boardId}
@@ -28,8 +29,8 @@
 
     <!-- 게시글 저장 -->
     <insert id="savePost" parameterType="com.example.Asum_BE.board.entity.BoardEntity" useGeneratedKeys="true" keyProperty="boardId">
-        INSERT INTO board (user_id, title, content, created_at)
-        VALUES (#{userId}, #{title}, #{content}, NOW())
+        INSERT INTO board (author_id, title, content, created_at, role)
+        VALUES (#{authorId}, #{title}, #{content}, NOW(), #{role})
     </insert>
 
     <!-- 게시글 수정 -->

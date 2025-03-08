@@ -37,13 +37,14 @@ public class BoardService {
 
                     return new BoardResponseDto(
                             postEntity.getBoardId(),
-                            postEntity.getUserId(),
+                            postEntity.getAuthorId(),
                             postEntity.getTitle(),
                             postEntity.getContent(),
                             thumbnailList,
                             postEntity.getCreatedAt(),
                             postEntity.getIsDeleted(),
-                            postEntity.getViewCount()
+                            postEntity.getViewCount(),
+                            postEntity.getRole()
                     );
                 })
                 .collect(Collectors.toList());
@@ -56,19 +57,20 @@ public class BoardService {
 
         return new BoardResponseDto(
                 postByIdEntity.getBoardId(),
-                postByIdEntity.getUserId(),
+                postByIdEntity.getAuthorId(),
                 postByIdEntity.getTitle(),
                 postByIdEntity.getContent(),
                 imagesByIdEntity.stream().map(BoardImageEntity::getStoreFileName).collect(Collectors.toList()),
                 postByIdEntity.getCreatedAt(),
                 postByIdEntity.getIsDeleted(),
-                postByIdEntity.getViewCount()
+                postByIdEntity.getViewCount(),
+                postByIdEntity.getRole()
         );
     }
 
     // 게시글 저장
     @Transactional
-    public BoardResponseDto savePost(BoardRequestDto boardRequestDto, List<MultipartFile> multipartFiles) throws IOException {
+    public BoardResponseDto savePost(BoardRequestDto boardRequestDto, List<MultipartFile> multipartFiles, Long authorId, String role) throws IOException {
 
         if(boardRequestDto.getTitle() == null || boardRequestDto.getTitle().trim().isEmpty()) {
             throw new InvalidPostException("제목은 필수 입력 항목입니다.");
@@ -78,9 +80,10 @@ public class BoardService {
         }
 
         BoardEntity board = BoardEntity.builder()
-                .userId(1L)
+                .authorId(authorId)
                 .title(boardRequestDto.getTitle())
                 .content(boardRequestDto.getContent())
+                .role(role)
                 .build();
         boardMapper.savePost(board);
 
@@ -93,7 +96,7 @@ public class BoardService {
 
         return new BoardResponseDto(
                 postByIdEntity.getBoardId(),
-                postByIdEntity.getUserId(),
+                postByIdEntity.getAuthorId(),
                 postByIdEntity.getTitle(),
                 postByIdEntity.getContent(),
                 boardImageEntities.stream()
@@ -101,7 +104,8 @@ public class BoardService {
                         .collect(Collectors.toList()),
                 postByIdEntity.getCreatedAt(),
                 postByIdEntity.getIsDeleted(),
-                postByIdEntity.getViewCount()
+                postByIdEntity.getViewCount(),
+                postByIdEntity.getRole()
         );
     }
 
@@ -134,7 +138,7 @@ public class BoardService {
 
         return new BoardResponseDto(
                 existedPostEntity.getBoardId(),
-                existedPostEntity.getUserId(),
+                existedPostEntity.getAuthorId(),
                 updatePostEntity.getTitle(),
                 updatePostEntity.getContent(),
                 imagesByIdEntity.stream()
@@ -142,7 +146,8 @@ public class BoardService {
                         .collect(Collectors.toList()),
                 existedPostEntity.getCreatedAt(),
                 existedPostEntity.getIsDeleted(),
-                existedPostEntity.getViewCount()
+                existedPostEntity.getViewCount(),
+                existedPostEntity.getRole()
         );
     }
 
