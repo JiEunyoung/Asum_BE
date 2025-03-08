@@ -35,4 +35,16 @@
         WHERE room_id = #{roomId}
         ORDER BY created_at DESC
     </select>
+
+    <!-- 채팅 참여자 조회 -->
+    <select id="findParticipantById" parameterType="java.lang.Long" resultType="com.example.Asum_BE.chat.entity.ChatParticipantEntity">
+        SELECT
+        r.user_id AS userId,
+        r.expert_id AS expertId,
+        c.sender_id AS senderId,
+        c.role
+        FROM chat_room r
+        JOIN chat c ON r.room_id = c.room_id
+        WHERE r.room_id = #{roomId};
+    </select>
 </mapper>

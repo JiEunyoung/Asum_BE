@@ -1,6 +1,7 @@
 package com.example.Asum_BE.chat.mapper;
 
 import com.example.Asum_BE.chat.entity.ChatEntity;
+import com.example.Asum_BE.chat.entity.ChatParticipantEntity;
 import com.example.Asum_BE.chat.entity.ChatRoomEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -23,4 +24,7 @@ public interface ChatMapper {
 
     // 모든 채팅 메시지 조회
     List<ChatEntity> findMessagesById(Long roomId);
+
+    // 채팅 참여자 조회
+    ChatParticipantEntity findParticipantById(Long roomId);
 }

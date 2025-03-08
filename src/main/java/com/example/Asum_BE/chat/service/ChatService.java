@@ -8,6 +8,7 @@ import com.example.Asum_BE.chat.entity.ChatEntity;
 import com.example.Asum_BE.chat.entity.ChatRoomEntity;
 import com.example.Asum_BE.chat.mapper.ChatMapper;
 import com.example.Asum_BE.exception.InvalidChatException;
+import com.example.Asum_BE.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final ChatMapper chatMapper;
+    private final NotificationService notificationService;
 
     // 채팅방 생성
     @Transactional
@@ -63,6 +65,8 @@ public class ChatService {
 
         chatMapper.sendMessage(chatEntity);
         ChatEntity sendChatEntity = chatMapper.findMessageById(chatEntity.getChatId());
+
+        notificationService.sendChatNotification(sendChatEntity, "새로운 채팅이 도착했어요,");
 
         return new ChatMessageResponseDto(
                 sendChatEntity.getRoomId(),

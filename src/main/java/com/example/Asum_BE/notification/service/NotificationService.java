@@ -3,6 +3,8 @@ package com.example.Asum_BE.notification.service;
 import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.mapper.BoardMapper;
 import com.example.Asum_BE.chat.entity.ChatEntity;
+import com.example.Asum_BE.chat.entity.ChatParticipantEntity;
+import com.example.Asum_BE.chat.mapper.ChatMapper;
 import com.example.Asum_BE.comment.entity.CommentEntity;
 import com.example.Asum_BE.notification.dto.NotificationResponseDto;
 import com.example.Asum_BE.notification.entity.NotificationEntity;
@@ -24,6 +26,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationMapper notificationMapper;
     private final BoardMapper boardMapper;
+    private final ChatMapper chatMapper;
 
     public SseEmitter subscribe(Long receiverId, String lastEventId) {
         // 고유한 emitter ID 생성
@@ -91,6 +94,52 @@ public class NotificationService {
                 .role(boardEntity.getRole())
                 .eventType("COMMENT")
                 .referenceId(boardEntity.getBoardId())
+                .content(content)
+                .build();
+    }
+
+    // 채팅 Notification send
+    public void sendChatNotification(ChatEntity entity, String content) {
+        // 알림 생성 및 저장
+        NotificationEntity notificationEntity = createChatNotification(entity, content);
+        notificationMapper.save(notificationEntity);
+
+        String id = notificationEntity.getReceiverId().toString();
+
+        // 로그인 한 유저의 SseEmitter 모두 가져오기
+        Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(id);
+        sseEmitters.forEach(
+                (key, emitter) -> {
+                    // 데이터 캐시 저장(유실된 데이터 처리하기 위함)
+                    emitterRepository.saveEventCache(key, notificationEntity);
+                    // 데이터 전송
+                    sendToClient(emitter, key, new NotificationResponseDto(notificationEntity.getEventType(), notificationEntity.getReferenceId(), notificationEntity.getContent()));
+                }
+        );
+    }
+
+    // 채팅 NotificationEntity
+    private NotificationEntity createChatNotification(ChatEntity entity, String content) {
+        ChatParticipantEntity chatParticipantEntity = chatMapper.findParticipantById(entity.getRoomId());
+
+        // sender의 role 확인 및 receiverId 저장
+        String role = chatParticipantEntity.getRole();
+        Long receiverId = 0L;
+        String sseRole = null;
+
+        if(role.equals("USER")) { // USER 채팅 보낸 경우
+            receiverId = chatParticipantEntity.getExpertId();
+            sseRole = "EXPERT";
+        } else {
+            receiverId = chatParticipantEntity.getUserId();
+            sseRole = "USER";
+        }
+
+        return NotificationEntity.builder()
+                .receiverId(receiverId)
+                .role(sseRole)
+                .eventType("CHAT")
+                .referenceId(entity.getRoomId())
                 .content(content)
                 .build();
     }
