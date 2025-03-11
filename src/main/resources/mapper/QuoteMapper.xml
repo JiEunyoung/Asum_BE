@@ -84,4 +84,64 @@
             <result property="otherAnswer" column="other_answer"/>
         </collection>
     </resultMap>
+
+    <!-- 견적서 조건에 맞는 성별 조회 -->
+    <select id="findGender" resultType="String">
+        SELECT a.answer_option
+        FROM answer a
+        WHERE a.answer_id = (
+        SELECT qu.answer_id
+        FROM quote qu
+        WHERE qu.question_id = (
+        SELECT DISTINCT q.question_id
+        FROM question q
+        JOIN category c ON c.category_id = q.category_id OR q.category_id IS NULL
+        JOIN answer a ON q.question_id = a.question_id
+        WHERE c.category_id = #{categoryId}
+        AND q.question LIKE '%고수의%'
+        AND (c.include_common = TRUE OR q.category_id IS NOT NULL)
+        )
+        AND qu.user_id = #{userId}
+        )
+    </select>
+
+    <!-- 견적서 조건에 맞는 고수 조회 -->
+    <select id="findQuoteExpertsById" resultType="com.example.Asum_BE.quote.entity.QuoteExpertEntity">
+        SELECT DISTINCT
+        q.user_id, ec.category_id, c.category_name,
+        e.expert_id, e.expert_name, e.location, e.gender
+        FROM expert_category ec
+        JOIN expert e ON ec.expert_id = e.expert_id
+        JOIN category c ON c.category_id = ec.category_id
+        JOIN quote q ON q.category_id = ec.category_id
+        WHERE c.category_id = #{categoryId}
+        AND q.user_id = #{userId}
+        AND e.location = (
+        SELECT a.answer_option
+        FROM answer a
+        WHERE a.answer_id = (
+        SELECT qu.answer_id
+        FROM quote qu
+        WHERE qu.question_id = (
+        SELECT DISTINCT q.question_id
+        FROM question q
+        JOIN category c ON c.category_id = q.category_id OR q.category_id IS NULL
+        JOIN answer a ON q.question_id = a.question_id
+        WHERE c.category_id = #{categoryId}
+        AND q.question LIKE '지역%'
+        AND (c.include_common = TRUE OR q.category_id IS NOT NULL)
+        LIMIT 1
+        )
+        AND qu.user_id = #{userId}
+        LIMIT 1
+        )
+        )
+        <if test="genderPreference != null and genderPreference == '남자'">
+            AND e.gender = 'M'
+        </if>
+        <if test="genderPreference != null and genderPreference == '여자'">
+            AND e.gender = 'F'
+        </if>
+    </select>
+
 </mapper>

@@ -10,12 +10,18 @@ import com.example.Asum_BE.notification.dto.NotificationResponseDto;
 import com.example.Asum_BE.notification.entity.NotificationEntity;
 import com.example.Asum_BE.notification.mapper.NotificationMapper;
 import com.example.Asum_BE.notification.repository.EmitterRepository;
+import com.example.Asum_BE.quote.entity.QuoteEntity;
+import com.example.Asum_BE.quote.entity.QuoteExpertEntity;
+import com.example.Asum_BE.quote.mapper.QuoteMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class NotificationService {
     private final NotificationMapper notificationMapper;
     private final BoardMapper boardMapper;
     private final ChatMapper chatMapper;
+    private final QuoteMapper quoteMapper;
 
     public SseEmitter subscribe(Long receiverId, String lastEventId) {
         // 고유한 emitter ID 생성
@@ -142,5 +149,60 @@ public class NotificationService {
                 .referenceId(entity.getRoomId())
                 .content(content)
                 .build();
+    }
+
+
+    // 견적서 요청 Notification send
+    public void sendQuoteNotification(QuoteEntity entity, String content) {
+        // 알림 생성 및 저장
+        List<NotificationEntity> quoteNotifications = createQuoteNotifications(entity, content);
+
+        for (NotificationEntity quoteNotification : quoteNotifications) {
+            System.out.println("알림 받을 expertId: " + quoteNotification.getReceiverId());
+            notificationMapper.save(quoteNotification);
+
+            String id = quoteNotification.getReceiverId().toString();
+
+            // 로그인 한 유저의 SseEmitter 모두 가져오기
+            Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(id);
+            sseEmitters.forEach(
+                    (key, emitter) -> {
+                        // 데이터 캐시 저장(유실된 데이터 처리하기 위함)
+                        emitterRepository.saveEventCache(key, quoteNotification);
+                        // 데이터 전송
+                        sendToClient(emitter, key, new NotificationResponseDto(quoteNotification.getEventType(), quoteNotification.getReferenceId(), quoteNotification.getContent()));
+                    }
+            );
+        }
+    }
+
+    // 견적서 요청 NotificationEntity
+    private List<NotificationEntity> createQuoteNotifications(QuoteEntity entity, String content) {
+        Map<String, Object> params = new HashMap<>();
+        Long userId = entity.getUserId();
+        Long categoryId = entity.getCategoryId();
+
+        String genderPreference = quoteMapper.findGender(userId, categoryId);
+
+        System.out.println("userId: " + userId);
+        System.out.println("categoryId: " + categoryId);
+        System.out.println("gender: " + genderPreference);
+
+        params.put("categoryId", categoryId);
+        params.put("userId", userId);
+        params.put("genderPreference", genderPreference);
+
+        List<QuoteExpertEntity> quoteExpertsByIdEntity = quoteMapper.findQuoteExpertsById(params);
+
+        return quoteExpertsByIdEntity.stream()
+                .map(quoteExpertEntity -> NotificationEntity.builder()
+                        .receiverId(quoteExpertEntity.getExpertId())
+                        .role("EXPERT")
+                        .eventType("QUOTE")
+                        .referenceId(quoteExpertEntity.getCategoryId())
+                        .content(content)
+                        .build())
+                .collect(Collectors.toList());
+
     }
 }

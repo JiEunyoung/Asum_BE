@@ -1,5 +1,6 @@
 package com.example.Asum_BE.quote.service;
 
+import com.example.Asum_BE.notification.service.NotificationService;
 import com.example.Asum_BE.quote.dto.requestDto.QuestionAnswerRequestDto;
 import com.example.Asum_BE.quote.dto.requestDto.UserAnswerRequestDto;
 import com.example.Asum_BE.quote.dto.responseDto.QuestionAnswerResponseDto;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class QuoteService {
 
     private final QuoteMapper quoteMapper;
+    private final NotificationService notificationService;
 
     // 선택한 카테고리에 대한 질문 & 답변 옵션 조회
     public QuestionsResponseDto findQuestionsAndAnswersById(Long categoryId) {
@@ -73,7 +75,7 @@ public class QuoteService {
         List<QuoteEntity> quoteEntities = questionAnswerRequestDtos.stream()
                 .map(dto -> {
                     return QuoteEntity.builder()
-                            .userId(2L)
+                            .userId(9L)
                             .categoryId(categoryId)
                             .questionId(dto.getQuestionId())
                             .answerId(dto.getAnswerId())
@@ -84,6 +86,8 @@ public class QuoteService {
 
         quoteMapper.saveQuote(quoteEntities);
 
-        return quoteMapper.findQuoteById(2L, categoryId);
+        notificationService.sendQuoteNotification(quoteEntities.get(0), "새로운 견적 요청서가 도착했습니다.");
+
+        return quoteMapper.findQuoteById(9L, categoryId);
     }
 }
