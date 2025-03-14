@@ -66,7 +66,7 @@ public class ChatService {
         chatMapper.sendMessage(chatEntity);
         ChatEntity sendChatEntity = chatMapper.findMessageById(chatEntity.getChatId());
 
-        notificationService.sendChatNotification(sendChatEntity, "새로운 채팅이 도착했어요,");
+        notificationService.sendChatNotification(sendChatEntity, "새로운 채팅이 도착했어요.");
 
         return new ChatMessageResponseDto(
                 sendChatEntity.getRoomId(),

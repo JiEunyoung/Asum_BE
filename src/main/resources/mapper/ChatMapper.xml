@@ -45,6 +45,8 @@
         c.role
         FROM chat_room r
         JOIN chat c ON r.room_id = c.room_id
-        WHERE r.room_id = #{roomId};
+        WHERE r.room_id = #{roomId}
+        ORDER BY c.created_at desc
+        LIMIT 1
     </select>
 </mapper>
