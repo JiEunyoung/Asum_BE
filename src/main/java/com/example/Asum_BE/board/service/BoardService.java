@@ -7,8 +7,9 @@ import com.example.Asum_BE.board.dto.responseDto.BoardResponseDto;
 import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.entity.BoardImageEntity;
 import com.example.Asum_BE.board.mapper.BoardMapper;
-import com.example.Asum_BE.exception.InvalidPostException;
+import com.example.Asum_BE.common.exception.InvalidPostException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,13 +71,13 @@ public class BoardService {
 
     // 게시글 저장
     @Transactional
-    public BoardResponseDto savePost(BoardRequestDto boardRequestDto, List<MultipartFile> multipartFiles, Long authorId, String role) throws IOException {
+    public Long savePost(BoardRequestDto boardRequestDto, List<MultipartFile> multipartFiles, Long authorId, String role) throws IOException {
 
         if(boardRequestDto.getTitle() == null || boardRequestDto.getTitle().trim().isEmpty()) {
-            throw new InvalidPostException("제목은 필수 입력 항목입니다.");
+            throw new InvalidPostException(400, "제목은 필수 입력 항목입니다.", HttpStatus.BAD_REQUEST);
         }
         if(boardRequestDto.getContent() == null || boardRequestDto.getContent().trim().isEmpty()){
-            throw new InvalidPostException("내용은 필수 입력 항목입니다.");
+            throw new InvalidPostException(400, "내용은 필수 입력 항목입니다.", HttpStatus.BAD_REQUEST);
         }
 
         BoardEntity board = BoardEntity.builder()
@@ -92,29 +93,15 @@ public class BoardService {
             boardMapper.savePostImages(board.getBoardId(), boardImageEntities);
         }
 
-        BoardEntity postByIdEntity = boardMapper.findPostById(board.getBoardId());
-
-        return new BoardResponseDto(
-                postByIdEntity.getBoardId(),
-                postByIdEntity.getAuthorId(),
-                postByIdEntity.getTitle(),
-                postByIdEntity.getContent(),
-                boardImageEntities.stream()
-                        .map(entity -> entity.getStoreFileName())
-                        .collect(Collectors.toList()),
-                postByIdEntity.getCreatedAt(),
-                postByIdEntity.getIsDeleted(),
-                postByIdEntity.getViewCount(),
-                postByIdEntity.getRole()
-        );
+        return board.getBoardId();
     }
 
     // 게시글 수정
     @Transactional
-    public BoardResponseDto updatePost(Long boardId, UpdateBoardRequestDto updateBoardRequestDto, List<MultipartFile> addMultipartFiles) throws IOException {
+    public Long updatePost(Long boardId, UpdateBoardRequestDto updateBoardRequestDto, List<MultipartFile> addMultipartFiles) throws IOException {
         BoardEntity existedPostEntity = boardMapper.findPostById(boardId);
         if(existedPostEntity == null || existedPostEntity.getIsDeleted()){
-            throw new InvalidPostException("해당 게시글이 존재하지 않거나 이미 삭제되었습니다.");
+            throw new InvalidPostException(404, "해당 게시글이 존재하지 않거나 이미 삭제되었습니다.", HttpStatus.NOT_FOUND);
         }
 
         // 삭제할 이미지 처리
@@ -136,19 +123,7 @@ public class BoardService {
         BoardEntity updatePostEntity = existedPostEntity.update(updateBoardRequestDto.getTitle(), updateBoardRequestDto.getContent());
         boardMapper.updatePost(updatePostEntity);
 
-        return new BoardResponseDto(
-                existedPostEntity.getBoardId(),
-                existedPostEntity.getAuthorId(),
-                updatePostEntity.getTitle(),
-                updatePostEntity.getContent(),
-                imagesByIdEntity.stream()
-                        .map(entity -> entity.getStoreFileName())
-                        .collect(Collectors.toList()),
-                existedPostEntity.getCreatedAt(),
-                existedPostEntity.getIsDeleted(),
-                existedPostEntity.getViewCount(),
-                existedPostEntity.getRole()
-        );
+        return updatePostEntity.getBoardId();
     }
 
     // 게시글 삭제
@@ -156,7 +131,7 @@ public class BoardService {
     public void deletePost(Long boardId){
         BoardResponseDto existedPost = findPostById(boardId);
         if (existedPost == null || existedPost.getIsDeleted()) {
-            throw new InvalidPostException("해당 게시글이 존재하지 않거나 이미 삭제되었습니다.");
+            throw new InvalidPostException(404, "해당 게시글이 존재하지 않거나 이미 삭제되었습니다.", HttpStatus.NOT_FOUND);
         }
 
         boardMapper.deletePost(boardId);

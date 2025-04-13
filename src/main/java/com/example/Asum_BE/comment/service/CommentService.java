@@ -5,9 +5,10 @@ import com.example.Asum_BE.comment.dto.responseDto.CommentResponseDto;
 import com.example.Asum_BE.comment.dto.responseDto.CommentsResponseDto;
 import com.example.Asum_BE.comment.entity.CommentEntity;
 import com.example.Asum_BE.comment.mapper.CommentMapper;
-import com.example.Asum_BE.exception.InvalidCommentException;
+import com.example.Asum_BE.common.exception.InvalidCommentException;
 import com.example.Asum_BE.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class CommentService {
 
         // 댓글 조회
         List<CommentEntity> commentsByIdEntity = commentMapper.findCommentsById(boardId);
+
         // 대댓글 조회
         List<CommentEntity> replyCommentsByIdEntity = commentMapper.findReplyCommentsById(boardId);
 
@@ -74,7 +76,7 @@ public class CommentService {
     public CommentResponseDto saveComment(CommentRequestDto commentRequestDto, Long authorId, String role) {
 
         if(commentRequestDto.getContent() == null || commentRequestDto.getContent().trim().isEmpty()) {
-            throw new InvalidCommentException("댓글은 필수 입력 항목입니다.");
+            throw new InvalidCommentException(400, "댓글은 필수 입력 항목입니다.", HttpStatus.BAD_REQUEST);
         }
 
         CommentEntity commentEntity = CommentEntity.builder()
@@ -106,7 +108,7 @@ public class CommentService {
     public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto) {
         CommentEntity commentByIdEntity = commentMapper.findCommentById(commentId);
         if(commentByIdEntity == null || commentByIdEntity.getIsDeleted()){
-            throw new InvalidCommentException("해당 댓글이 존재하지 않거나 이미 삭제되었습니다.");
+            throw new InvalidCommentException(404, "해당 댓글이 존재하지 않거나 이미 삭제되었습니다.", HttpStatus.NOT_FOUND);
         }
 
         CommentEntity updateEntity = commentByIdEntity.update(commentRequestDto.getContent());
@@ -128,7 +130,7 @@ public class CommentService {
     public void deleteComment(Long commentId) {
         CommentEntity existedComment = commentMapper.findCommentById(commentId);
         if(existedComment == null || existedComment.getIsDeleted()){
-            throw new InvalidCommentException("해당 댓글이 존재하지 않거나 이미 삭제되었습니다.");
+            throw new InvalidCommentException(404, "해당 댓글이 존재하지 않거나 이미 삭제되었습니다.", HttpStatus.NOT_FOUND);
         }
 
         commentMapper.deleteComment(commentId);
