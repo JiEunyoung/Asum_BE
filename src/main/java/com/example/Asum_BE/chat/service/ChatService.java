@@ -7,9 +7,10 @@ import com.example.Asum_BE.chat.dto.responseDto.ChatRoomResponseDto;
 import com.example.Asum_BE.chat.entity.ChatEntity;
 import com.example.Asum_BE.chat.entity.ChatRoomEntity;
 import com.example.Asum_BE.chat.mapper.ChatMapper;
-import com.example.Asum_BE.exception.InvalidChatException;
+import com.example.Asum_BE.common.exception.InvalidChatException;
 import com.example.Asum_BE.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +28,12 @@ public class ChatService {
     @Transactional
     public ChatRoomResponseDto createChatRoom(ChatRoomRequestDto chatRoomRequestDto) {
         if(chatRoomRequestDto.getUserId() == null || chatRoomRequestDto.getExpertId() == null) {
-            throw new InvalidChatException("채팅방을 생성할 수 없습니다. 다시 시도해주세요.");
+            throw new InvalidChatException(400, "채팅방을 생성할 수 없습니다. 다시 시도해주세요.", HttpStatus.BAD_REQUEST);
         }
 
         ChatRoomEntity existingChatRoomEntity = chatMapper.findChatRoomById(chatRoomRequestDto.getUserId(), chatRoomRequestDto.getExpertId());
         if(existingChatRoomEntity != null) {
-            throw new InvalidChatException("이미 존재하는 채팅방입니다.");
+            throw new InvalidChatException(409, "이미 존재하는 채팅방입니다.", HttpStatus.CONFLICT);
         }
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
@@ -53,7 +54,7 @@ public class ChatService {
     @Transactional
     public ChatMessageResponseDto sendMessage(ChatMessageRequestDto chatMessageRequestDto) {
         if(chatMessageRequestDto.getMessage() == null || chatMessageRequestDto.getMessage().trim().isEmpty()) {
-            throw new InvalidChatException("메시지를 입력해주세요.");
+            throw new InvalidChatException(400, "메시지를 입력해주세요.", HttpStatus.BAD_REQUEST);
         }
 
         ChatEntity chatEntity = ChatEntity.builder()
