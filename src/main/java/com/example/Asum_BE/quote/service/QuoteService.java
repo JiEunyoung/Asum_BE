@@ -1,5 +1,6 @@
 package com.example.Asum_BE.quote.service;
 
+import com.example.Asum_BE.common.exception.InvalidQuoteException;
 import com.example.Asum_BE.notification.service.NotificationService;
 import com.example.Asum_BE.quote.dto.requestDto.QuestionAnswerRequestDto;
 import com.example.Asum_BE.quote.dto.requestDto.UserAnswerRequestDto;
@@ -9,6 +10,7 @@ import com.example.Asum_BE.quote.entity.QuestionEntity;
 import com.example.Asum_BE.quote.entity.QuoteEntity;
 import com.example.Asum_BE.quote.mapper.QuoteMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +98,12 @@ public class QuoteService {
 
     // (회원 입장, 전문가 입장) 견적 요청서 상세 조회
     public QuoteResponseDto findQuoteById(Long userId, Long categoryId) {
-        return quoteMapper.findQuoteById(userId, categoryId);
+        QuoteResponseDto quoteResponseDto = quoteMapper.findQuoteById(userId, categoryId);
+        if(quoteResponseDto == null) {
+            throw new InvalidQuoteException(404, "이미 마감되거나 삭제된 견적 요청서입니다.", HttpStatus.NOT_FOUND);
+        }
+
+        return quoteResponseDto;
     }
 
     // (전문가 입장) 받은 견적 요청서 목록 조회

@@ -6,6 +6,7 @@ import com.example.Asum_BE.chat.entity.ChatEntity;
 import com.example.Asum_BE.chat.entity.ChatParticipantEntity;
 import com.example.Asum_BE.chat.mapper.ChatMapper;
 import com.example.Asum_BE.comment.entity.CommentEntity;
+import com.example.Asum_BE.common.exception.InvalidQuoteException;
 import com.example.Asum_BE.notification.dto.NotificationResponseDto;
 import com.example.Asum_BE.notification.entity.NotificationEntity;
 import com.example.Asum_BE.notification.mapper.NotificationMapper;
@@ -14,6 +15,7 @@ import com.example.Asum_BE.quote.entity.QuoteEntity;
 import com.example.Asum_BE.quote.entity.QuoteExpertEntity;
 import com.example.Asum_BE.quote.mapper.QuoteMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -193,6 +195,9 @@ public class NotificationService {
         params.put("genderPreference", genderPreference);
 
         List<QuoteExpertEntity> quoteExpertsByIdEntity = quoteMapper.findQuoteExpertsById(params);
+        if (quoteExpertsByIdEntity == null || quoteExpertsByIdEntity.isEmpty()) {
+            throw new InvalidQuoteException(404, "해당 견적 요청서 조건에 만족하는 고수가 존재하지 않습니다.\n다른 조건으로 다시 견적 요청서를 작성해주세요.", HttpStatus.NOT_FOUND);
+        }
 
         return quoteExpertsByIdEntity.stream()
                 .map(quoteExpertEntity -> NotificationEntity.builder()

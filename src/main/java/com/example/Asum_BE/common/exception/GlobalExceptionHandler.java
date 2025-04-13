@@ -29,4 +29,12 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseDto.fail(ex.getErrorCode(), ex.getMessage()));
 
     }
+
+    @ExceptionHandler(InvalidQuoteException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidQuoteException(InvalidQuoteException ex) {
+        return ResponseEntity
+                .status(ex.getHttpStatus())
+                .body(ApiResponseDto.fail(ex.getErrorCode(), ex.getMessage()));
+
+    }
 }
