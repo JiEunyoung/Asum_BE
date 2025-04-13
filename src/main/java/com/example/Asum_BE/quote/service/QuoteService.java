@@ -3,9 +3,7 @@ package com.example.Asum_BE.quote.service;
 import com.example.Asum_BE.notification.service.NotificationService;
 import com.example.Asum_BE.quote.dto.requestDto.QuestionAnswerRequestDto;
 import com.example.Asum_BE.quote.dto.requestDto.UserAnswerRequestDto;
-import com.example.Asum_BE.quote.dto.responseDto.QuestionAnswerResponseDto;
-import com.example.Asum_BE.quote.dto.responseDto.QuestionsResponseDto;
-import com.example.Asum_BE.quote.dto.responseDto.QuoteResponseDto;
+import com.example.Asum_BE.quote.dto.responseDto.*;
 import com.example.Asum_BE.quote.entity.AnswerEntity;
 import com.example.Asum_BE.quote.entity.QuestionEntity;
 import com.example.Asum_BE.quote.entity.QuoteEntity;
@@ -89,5 +87,22 @@ public class QuoteService {
         notificationService.sendQuoteNotification(quoteEntities.get(0), "새로운 견적 요청서가 도착했습니다.");
 
         return quoteMapper.findQuoteById(9L, categoryId);
+    }
+
+    // (회원 입장) 작성한 견적 요청서 목록 조회
+    public List<QuoteListForUserResponseDto> findAllQuotesForUser(Long userId) {
+        return quoteMapper.findAllQuotesForUser(userId);
+    }
+
+    // (회원 입장, 전문가 입장) 견적 요청서 상세 조회
+    public QuoteResponseDto findQuoteById(Long userId, Long categoryId) {
+        return quoteMapper.findQuoteById(userId, categoryId);
+    }
+
+    // (전문가 입장) 받은 견적 요청서 목록 조회
+    public List<QuoteListForExpertResponseDto> findAllQuotesForExpert(Long expertId) {
+        Character gender = quoteMapper.findGender(expertId);
+
+        return quoteMapper.findAllQuotesForExpert(expertId, gender);
     }
 }

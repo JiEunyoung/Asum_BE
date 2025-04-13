@@ -182,7 +182,7 @@ public class NotificationService {
         Long userId = entity.getUserId();
         Long categoryId = entity.getCategoryId();
 
-        String genderPreference = quoteMapper.findGender(userId, categoryId);
+        String genderPreference = quoteMapper.findGenderForExpert(userId, categoryId);
 
         System.out.println("userId: " + userId);
         System.out.println("categoryId: " + categoryId);
