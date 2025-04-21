@@ -1,5 +1,6 @@
 package com.example.Asum_BE.board.mapper;
 
+import com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto;
 import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.entity.BoardImageEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -10,10 +11,10 @@ import java.util.List;
 public interface BoardMapper {
 
     // 게시글 목록 조회
-    List<BoardEntity> findAllPosts();
+    List<BoardListResponseDto> findAllPosts(int offset, int size);
 
     // 게시글 조회
-    BoardEntity findPostById(Long id);
+    BoardEntity findPostById(Long boardId);
 
     // 게시글 저장
     void savePost(BoardEntity boardEntity);
@@ -34,7 +35,7 @@ public interface BoardMapper {
     void savePostImages(Long boardId, List<BoardImageEntity> boardImageEntities);
 
     // 게시글 삭제로 인한 이미지 삭제
-    void deletePostToImage(Long id);
+    void deletePostToImage(Long boardId);
 
     // 게시글 수정에서의 이미지 삭제
     void deleteImage(Long boardId, String deleteImage);

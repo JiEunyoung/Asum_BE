@@ -3,6 +3,7 @@ package com.example.Asum_BE.board.service;
 import com.example.Asum_BE.board.FileStore;
 import com.example.Asum_BE.board.dto.requestDto.BoardRequestDto;
 import com.example.Asum_BE.board.dto.requestDto.UpdateBoardRequestDto;
+import com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto;
 import com.example.Asum_BE.board.dto.responseDto.BoardResponseDto;
 import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.entity.BoardImageEntity;
@@ -27,25 +28,21 @@ public class BoardService {
     private final FileStore fileStore;
 
     // 게시글 목록 조회
-    public List<BoardResponseDto> findAllPosts(){
-        List<BoardEntity> allPostsEntity = boardMapper.findAllPosts();
+    public List<BoardListResponseDto> findAllPosts(int page, int size){
+        int offset = page * size;
+        List<BoardListResponseDto> allPosts = boardMapper.findAllPosts(offset, size);
 
         // 게시글 썸네일 처리
-        return allPostsEntity.stream()
+        return allPosts.stream()
                 .map(postEntity -> {
                     String thumbnail = boardMapper.findThumbnailById(postEntity.getBoardId());
-                    List<String> thumbnailList = thumbnail != null ? List.of(thumbnail) : Collections.emptyList();
 
-                    return new BoardResponseDto(
+                    return new BoardListResponseDto(
                             postEntity.getBoardId(),
-                            postEntity.getAuthorId(),
                             postEntity.getTitle(),
-                            postEntity.getContent(),
-                            thumbnailList,
+                            thumbnail,
                             postEntity.getCreatedAt(),
-                            postEntity.getIsDeleted(),
-                            postEntity.getViewCount(),
-                            postEntity.getRole()
+                            postEntity.getViewCount()
                     );
                 })
                 .collect(Collectors.toList());
@@ -88,9 +85,11 @@ public class BoardService {
                 .build();
         boardMapper.savePost(board);
 
-        List<BoardImageEntity> boardImageEntities = fileStore.storeFiles(board.getBoardId(), multipartFiles);
-        if (!boardImageEntities.isEmpty()) {
-            boardMapper.savePostImages(board.getBoardId(), boardImageEntities);
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            List<BoardImageEntity> boardImageEntities = fileStore.storeFiles(board.getBoardId(), multipartFiles);
+            if (!boardImageEntities.isEmpty()) {
+                boardMapper.savePostImages(board.getBoardId(), boardImageEntities);
+            }
         }
 
         return board.getBoardId();

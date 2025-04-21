@@ -3,6 +3,7 @@ package com.example.Asum_BE.board.controller;
 import com.example.Asum_BE.board.dto.requestDto.BoardRequestDto;
 import com.example.Asum_BE.board.dto.requestDto.UpdateBoardRequestDto;
 import com.example.Asum_BE.board.dto.responseDto.BoardIdResponseDto;
+import com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto;
 import com.example.Asum_BE.board.dto.responseDto.BoardResponseDto;
 import com.example.Asum_BE.board.service.BoardService;
 import com.example.Asum_BE.common.dto.responseDto.ApiResponseDto;
@@ -24,13 +25,16 @@ public class BoardController {
 
     // 게시글 목록 조회
     @GetMapping("/api/community/posts")
-    public ResponseEntity<ApiResponseDto<List<BoardResponseDto>>> findAllPosts() {
+    public ResponseEntity<ApiResponseDto<List<BoardListResponseDto>>> findAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
         return ResponseEntity
                 .ok(ApiResponseDto.success(
                         200,
                         "게시글 목록 조회 성공",
-                        boardService.findAllPosts()
+                        boardService.findAllPosts(page, size)
                 ));
     }
 
