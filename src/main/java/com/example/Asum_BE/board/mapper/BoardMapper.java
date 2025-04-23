@@ -5,13 +5,17 @@ import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.entity.BoardImageEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface BoardMapper {
 
-    // 게시글 목록 조회
+    // 게시글 목록 조회(offset)
     List<BoardListResponseDto> findAllPosts(int offset, int size);
+
+    // 게시글 목록 조회(no-offset) cursor
+    List<BoardListResponseDto> findAllPostsByCursor(LocalDateTime cursorCreatedAt, Long cursorBoardId, int size);
 
     // 게시글 조회
     BoardEntity findPostById(Long boardId);

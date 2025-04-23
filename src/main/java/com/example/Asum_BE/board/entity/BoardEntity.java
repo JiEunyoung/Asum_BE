@@ -1,13 +1,11 @@
 package com.example.Asum_BE.board.entity;
 
-import com.example.Asum_BE.board.dto.responseDto.BoardResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -18,13 +16,13 @@ public class BoardEntity {
     private String title;
     private String content;
     private List<BoardImageEntity> boardImageEntities;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private Boolean isDeleted;
     private Long viewCount;
     private String role;
 
     @Builder
-    BoardEntity(Long boardId, Long authorId, String title, String content, List<BoardImageEntity> boardImageEntities, Date createdAt, Boolean isDeleted, Long viewCount, String role) {
+    BoardEntity(Long boardId, Long authorId, String title, String content, List<BoardImageEntity> boardImageEntities, LocalDateTime createdAt, Boolean isDeleted, Long viewCount, String role) {
         this.boardId = boardId;
         this.authorId = authorId;
         this.title = title;

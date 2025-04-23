@@ -2,7 +2,7 @@ package com.example.Asum_BE.board.dto.responseDto;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,7 +16,7 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private List<String> storeFilePath;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private Boolean isDeleted;
     private Long viewCount;
     private String role;

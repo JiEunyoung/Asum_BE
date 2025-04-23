@@ -5,6 +5,7 @@ import com.example.Asum_BE.board.dto.requestDto.BoardRequestDto;
 import com.example.Asum_BE.board.dto.requestDto.UpdateBoardRequestDto;
 import com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto;
 import com.example.Asum_BE.board.dto.responseDto.BoardResponseDto;
+import com.example.Asum_BE.board.dto.responseDto.CursorPageResponseDto;
 import com.example.Asum_BE.board.entity.BoardEntity;
 import com.example.Asum_BE.board.entity.BoardImageEntity;
 import com.example.Asum_BE.board.mapper.BoardMapper;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class BoardService {
     private final BoardMapper boardMapper;
     private final FileStore fileStore;
 
-    // 게시글 목록 조회
+    // 게시글 목록 조회(offset)
     public List<BoardListResponseDto> findAllPosts(int page, int size){
         int offset = page * size;
         List<BoardListResponseDto> allPosts = boardMapper.findAllPosts(offset, size);
@@ -46,6 +47,36 @@ public class BoardService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    // 게시글 목록 조회(no-offset)
+    public CursorPageResponseDto<BoardListResponseDto> findAllPostsByCursor(LocalDateTime cursorCreatedAt, Long cursorBoardId, int size) {
+        List<BoardListResponseDto> allPostsByCursor =
+                boardMapper.findAllPostsByCursor(cursorCreatedAt, cursorBoardId, size);
+
+        //게시글 썸네일 처리
+        List<BoardListResponseDto> allPosts = allPostsByCursor.stream()
+                .map(post -> {
+                    String thumbnail = boardMapper.findThumbnailById(post.getBoardId());
+
+                    return new BoardListResponseDto(
+                            post.getBoardId(),
+                            post.getTitle(),
+                            thumbnail,
+                            post.getCreatedAt(),
+                            post.getViewCount()
+                    );
+                })
+                .collect(Collectors.toList());
+        
+        // 마지막 데이터 커서 처리
+        CursorPageResponseDto.CursorDto nextCursor = null;
+        if(!allPosts.isEmpty()) {
+            BoardListResponseDto lastPost = allPosts.get(allPosts.size() - 1);
+            nextCursor = new CursorPageResponseDto.CursorDto(lastPost.getCreatedAt(), lastPost.getBoardId());
+        }
+
+        return new CursorPageResponseDto<>(allPosts, nextCursor);
     }
 
     // 게시글 조회

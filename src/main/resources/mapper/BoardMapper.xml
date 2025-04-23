@@ -4,12 +4,26 @@
 
 <mapper namespace="com.example.Asum_BE.board.mapper.BoardMapper">
 
-    <!-- 게시글 목록 조회 -->
+    <!-- 게시글 목록 조회(offset) -->
     <select id="findAllPosts" resultType="com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto">
-        SELECT board_id, title, created_at, view_count FROM board
+        SELECT board_id, title, created_at, view_count
+        FROM board
         WHERE is_deleted = FALSE
         ORDER BY created_at DESC
         LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 게시글 목록 조회(no-offset) -->
+    <select id="findAllPostsByCursor" resultType="com.example.Asum_BE.board.dto.responseDto.BoardListResponseDto">
+        SELECT board_id, title, created_at, view_count
+        FROM board
+        WHERE is_deleted = FALSE
+        <if test="cursorCreatedAt != null and cursorBoardId != null">
+            AND (created_at &lt; #{cursorCreatedAt}
+            OR (created_at = #{cursorCreatedAt} AND board_id &lt; #{cursorBoardId}))
+        </if>
+        ORDER BY created_at DESC, board_id DESC
+        LIMIT #{size}
     </select>
 
     <!-- 게시글 조회 -->
