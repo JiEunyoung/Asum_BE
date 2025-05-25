@@ -17,12 +17,12 @@ mybatis:
   config-location: classpath:mybatis-config.xml
   type-aliases-package: com.example.Asum_BE
 
-logging:
-  level:
-    com.example.Asum_BE.board.mapper: DEBUG
-    com.example.Asum_BE.common.interceptor: DEBUG
-    org.mybatis: DEBUG
-    jdbc.sqlonly: DEBUG
+#logging:
+#  level:
+#    com.example.Asum_BE.quote.mapper: DEBUG
+#    com.example.Asum_BE.common.interceptor: DEBUG
+#    org.mybatis: DEBUG
+#    jdbc.sqlonly: DEBUG
 
 file:
   dir: C:\\Users\\USER\\Desktop\\imgFile\\

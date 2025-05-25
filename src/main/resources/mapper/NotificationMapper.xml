@@ -4,8 +4,19 @@
 
 <mapper namespace="com.example.Asum_BE.notification.mapper.NotificationMapper">
 
+    <!-- 알림 내역 저장 -->
     <insert id="save" parameterType="com.example.Asum_BE.notification.entity.NotificationEntity" useGeneratedKeys="true" keyProperty="notificationId">
         INSERT INTO notification (receiver_id, role, event_type, reference_id, content, created_at)
         VALUES (#{receiverId}, #{role}, #{eventType}, #{referenceId}, #{content}, NOW())
     </insert>
+
+    <!-- 알림 내역 저장(batch size) -->
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO notification (receiver_id, role, event_type, reference_id, content, created_at)
+        VALUES
+        <foreach collection="list" item="n" separator=",">
+            (#{n.receiverId}, #{n.role}, #{n.eventType}, #{n.referenceId}, #{n.content}, NOW())
+        </foreach>
+    </insert>
+
 </mapper>
